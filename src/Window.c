@@ -30,6 +30,10 @@ Window* WindowInit(char* name, int width, int height)
     win->wptr = glfwCreateWindow(width, height, name, NULL, NULL);
     if (!win->wptr) { WERR("GLFW window creation failed"); WindowsTerminate(); return NULL; }
 
+    win->name = name;
+    win->WIDTH = width;
+    win->HEIGHT = height;
+
     glfwMakeContextCurrent(win->wptr);
     MapPush(Windows, name, (void*)win);
     return win;

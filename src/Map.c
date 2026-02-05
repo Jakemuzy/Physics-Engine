@@ -13,7 +13,6 @@ void MapPush(Map* mp, char* key, void* val)
     if (mp->bkts[hsh]) 
         BucketFree(MapPop(mp, key));
 
-
     Bucket* bkt = malloc(sizeof(Bucket));
     bkt->val = val;
     mp->bkts[hsh] = bkt; 

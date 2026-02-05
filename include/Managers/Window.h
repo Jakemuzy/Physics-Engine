@@ -32,7 +32,7 @@ void WERR(char* msg);
 typedef struct Window {
     GLFWwindow* wptr;
     char* name;
-    const unsigned int WIDTH, HEIGHT;
+    unsigned int WIDTH, HEIGHT;
 } Window;
 extern Map* Windows;
 

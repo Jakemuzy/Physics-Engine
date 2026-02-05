@@ -2,25 +2,14 @@
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
+#include <math.h>
 
 #include "Window.h"
 #include "Shader.h"
+#include "Mesh.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
-
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
 
 int main()
 {
@@ -29,48 +18,79 @@ int main()
     glfwSetFramebufferSizeCallback(win->wptr, framebuffer_size_callback);
     LoadGlad();
 
-    Shader shdr = ShaderProgInit(vertexShaderSource, fragmentShaderSource);
+    Shader shdr = ShaderProgInit("BasicShader", "shaders/v1.vs", "shaders/f1.fs");
 
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top   
-    }; 
+    float cubeVertices[] = {
+        // Back face (soft red)
+        -0.5f, -0.5f, -0.5f,  1.0f,0.6f,0.6f,
+         0.5f, -0.5f, -0.5f,  0.9f,0.5f,0.5f,
+         0.5f,  0.5f, -0.5f,  0.8f,0.4f,0.4f,
+         0.5f,  0.5f, -0.5f,  0.8f,0.4f,0.4f,
+        -0.5f,  0.5f, -0.5f,  0.9f,0.5f,0.5f,
+        -0.5f, -0.5f, -0.5f,  1.0f,0.6f,0.6f,
 
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
+        // Front face (soft green)
+        -0.5f, -0.5f, 0.5f,   0.6f,1.0f,0.6f,
+         0.5f, -0.5f, 0.5f,   0.5f,0.9f,0.5f,
+         0.5f, 0.5f, 0.5f,    0.4f,0.8f,0.4f,
+         0.5f, 0.5f, 0.5f,    0.4f,0.8f,0.4f,
+        -0.5f, 0.5f, 0.5f,    0.5f,0.9f,0.5f,
+        -0.5f, -0.5f, 0.5f,   0.6f,1.0f,0.6f,
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        // Left face (soft blue)
+        -0.5f,  0.5f,  0.5f,  0.6f,0.8f,1.0f,
+        -0.5f,  0.5f, -0.5f,  0.5f,0.7f,0.9f,
+        -0.5f, -0.5f, -0.5f,  0.4f,0.6f,0.8f,
+        -0.5f, -0.5f, -0.5f,  0.4f,0.6f,0.8f,
+        -0.5f, -0.5f,  0.5f,  0.5f,0.7f,0.9f,
+        -0.5f,  0.5f,  0.5f,  0.6f,0.8f,1.0f,
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+        // Right face (soft yellow)
+         0.5f,  0.5f,  0.5f,  1.0f,1.0f,0.6f,
+         0.5f,  0.5f, -0.5f,  0.9f,0.9f,0.5f,
+         0.5f, -0.5f, -0.5f,  0.8f,0.8f,0.4f,
+         0.5f, -0.5f, -0.5f,  0.8f,0.8f,0.4f,
+         0.5f, -0.5f,  0.5f,  0.9f,0.9f,0.5f,
+         0.5f,  0.5f,  0.5f,  1.0f,1.0f,0.6f,
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-    glBindVertexArray(0); 
+        // Bottom face (soft purple)
+        -0.5f, -0.5f, -0.5f,  0.8f,0.6f,0.9f,
+         0.5f, -0.5f, -0.5f,  0.7f,0.5f,0.8f,
+         0.5f, -0.5f,  0.5f,  0.6f,0.4f,0.7f,
+         0.5f, -0.5f,  0.5f,  0.6f,0.4f,0.7f,
+        -0.5f, -0.5f,  0.5f,  0.7f,0.5f,0.8f,
+        -0.5f, -0.5f, -0.5f,  0.8f,0.6f,0.9f,
 
+        // Top face (soft cyan)
+        -0.5f, 0.5f, -0.5f,   0.6f,1.0f,1.0f,
+         0.5f, 0.5f, -0.5f,   0.5f,0.9f,0.9f,
+         0.5f, 0.5f,  0.5f,   0.4f,0.8f,0.8f,
+         0.5f, 0.5f,  0.5f,   0.4f,0.8f,0.8f,
+        -0.5f, 0.5f,  0.5f,   0.5f,0.9f,0.9f,
+        -0.5f, 0.5f, -0.5f,   0.6f,1.0f,1.0f,
+    };
+
+
+    int vertexCount = 36;
+    Mesh* mesh = MeshInit("tri", cubeVertices, vertexCount, true, false, false);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     while (!glfwWindowShouldClose(win->wptr))
     {
         processInput(win->wptr);
 
-        glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+        glClearColor(0.15f, 0.43f, 0.25f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shdr);
-        glBindVertexArray(VAO); 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        GLuint sprog = ShaderProgUse("BasicShader");
+        MeshDraw("tri");
 
         glfwSwapBuffers(win->wptr);
+        glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shdr);
-
+    MeshsTerminate();
+    ShadersTerminate();
     WindowsTerminate();
     return 0;
 }
@@ -79,6 +99,8 @@ int main()
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
+    if (!window)
+        printf("INVALID WINDOW\n");
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) 
@@ -91,7 +113,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
 }
 
 

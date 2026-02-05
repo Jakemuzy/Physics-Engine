@@ -29,6 +29,10 @@ target_include_directories(glad PUBLIC
 
 target_include_directories(Physics-Engine 
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Managers
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Controllers
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/DataStructures
+
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
