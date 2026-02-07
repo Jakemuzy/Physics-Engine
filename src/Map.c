@@ -35,8 +35,7 @@ void* MapLook(Map* mp, char* key)
 
 void MapFree(Map* mp)
 {
-    unsigned int i;
-    for (i = 0; i < SIZE; i++) {
+    for (unsigned int i = 0; i < SIZE; i++) {
         if (mp->bkts[i]) 
             BucketFree(mp->bkts[i]);
     }
@@ -56,8 +55,8 @@ void BucketFree(Bucket* bkt)
 
 unsigned int Hash(char* key)
 {
-    unsigned int hash = 5381;
     int c;
+    unsigned int hash = 5381;
     while (c = *key++)
         hash = ((hash <<5) + hash) + c;
 

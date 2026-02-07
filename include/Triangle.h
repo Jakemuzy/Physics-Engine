@@ -8,9 +8,9 @@
 #ifndef _TRIANGLE_H__
 #define _TRIANGLE_H__
 
-/* ----- Triangle Logic ----- */
+#include "Vlm.h"
 
-typedef struct Vec3 { float x, y, z; } Vec3;
+/* ----- Triangle Logic ----- */
 
 typedef struct Vertex {
     Vec3 coord;

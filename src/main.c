@@ -2,11 +2,13 @@
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <math.h>
 
 #include "Window.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Vlm.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -69,6 +71,8 @@ int main()
         -0.5f, 0.5f,  0.5f,   0.5f,0.9f,0.9f,
         -0.5f, 0.5f, -0.5f,   0.6f,1.0f,1.0f,
     };
+
+    InitMat(2, 2, (double[]){1, 2, 3, 4});
 
 
     int vertexCount = 36;
