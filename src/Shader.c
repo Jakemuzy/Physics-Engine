@@ -53,6 +53,7 @@ GLuint ShaderInit(GLenum stype, const char* src)
     int success;
     glGetShaderiv(shdr, GL_COMPILE_STATUS, &success);
     if (!success) { 
+        printf("%s\n", stype == GL_VERTEX_SHADER ? "Vertex" : "Fragment");
         SHERR(shdr);
         return SHDR_ERR;
     }
@@ -71,7 +72,7 @@ GLuint ShaderProgUse(char* shaderProgName)
 
 void ShaderSetVal(char* progName, char* varName, UNIFORM_TYPE type, void* value) 
 {
-    GLuint sprog = ShaderProgUse(progName);
+    GLint sprog = ShaderProgUse(progName);
     if (sprog == -1) return;
 
     GLint loc = glGetUniformLocation(sprog, varName);

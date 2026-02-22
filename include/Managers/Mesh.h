@@ -17,6 +17,7 @@
 #include <string.h>
 
 #include "Map.h"
+#include "Vlm.h"
 #include "Triangle.h"
 
 /* ----- Lifetime Handling ----- */
@@ -29,6 +30,8 @@ typedef struct Mesh {
     char* name;
     GLuint VBO, VAO, EBO;
     bool color, normal, tcoord;
+
+    Mat mat;
 
     Triangle* tris; /* Will be unused for now */
     unsigned int vertCount;

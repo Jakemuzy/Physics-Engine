@@ -26,7 +26,6 @@
 static bool WGLFW_INITIALIZED = false;
 void WERR(char* msg);
 
-
 /* ----- Window Logic ------ */
 
 typedef struct Window {

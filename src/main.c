@@ -6,9 +6,11 @@
 #include <math.h>
 
 #include "Window.h"
+#include "Input.h"
 #include "Shader.h"
 #include "Mesh.h"
 #include "Vlm.h"
+#include "Camera.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -16,9 +18,12 @@ void processInput(GLFWwindow *window);
 int main()
 {
     Window* win = WindowInit("Physics", 800, 600);
+    InputHandler* ih = InputHandlerInit(win);
     
     glfwSetFramebufferSizeCallback(win->wptr, framebuffer_size_callback);
     LoadGlad();
+
+    //AttachInput(ih, "Escape", GLFW_KEY_ESCAPE, PRESS, glfwSetWindowShouldClose(win, true));
 
     Shader shdr = ShaderProgInit("BasicShader", "shaders/v1.vs", "shaders/f1.fs");
 
@@ -72,21 +77,43 @@ int main()
         -0.5f, 0.5f, -0.5f,   0.6f,1.0f,1.0f,
     };
 
-    InitMat(2, 2, (double[]){1, 2, 3, 4});
-
+    const float radius = 3.0f;
+    Camera* cam = InitCamera(
+        InitVec3(0.0, 0.0, 3.0),
+        InitVec3(0.0, 0.0, 0.0),
+        InitVec3(0.0, 1.0, 0.0)
+    );
+   
+    Mat identity = InitMatIdentity(4,4,1);
+    Mat proj = MatPerspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+    ShaderSetVal("BasicShader", "model", U_MAT4, identity.data);
+    ShaderSetVal("BasicShader", "proj", U_MAT4, proj.data);
 
     int vertexCount = 36;
     Mesh* mesh = MeshInit("tri", cubeVertices, vertexCount, true, false, false);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(win->wptr))
     {
         processInput(win->wptr);
 
         glClearColor(0.15f, 0.43f, 0.25f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        GLuint sprog = ShaderProgUse("BasicShader");
+        float camx = sin(glfwGetTime()) * radius;
+        float camz = cos(glfwGetTime()) * radius;
+        
+        cam->view = MatLookAt(
+            InitVec3(camx, 0.0, camz),
+            InitVec3(0.0, 0.0, 0.0),
+            InitVec3(0.0, 1.0, 0.0)
+        );
+
+        GLuint sprog = ShaderProgUse("BasicShader"); /* Not required SetVal does this */
+        ShaderSetVal("BasicShader", "model", U_MAT4, identity.data);
+        ShaderSetVal("BasicShader", "view", U_MAT4, (void*)cam->view.data);
+        ShaderSetVal("BasicShader", "proj", U_MAT4, proj.data);
         MeshDraw("tri");
 
         glfwSwapBuffers(win->wptr);
@@ -99,20 +126,16 @@ int main()
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
     if (!window)
         printf("INVALID WINDOW\n");
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) 
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) 
         printf("E");
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
