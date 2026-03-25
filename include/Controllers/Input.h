@@ -30,7 +30,8 @@ typedef struct InputAction {
     GLint key;
     InputType type;
 
-    void (*action)(void);
+    void (*action)(void* params);
+    void* params;
 } InputAction;
 
 typedef struct InputHandler {
@@ -43,7 +44,7 @@ typedef struct InputHandler {
 
 InputHandler* InputHandlerInit(Window* target);
 
-void AttachInput(InputHandler* handler, char* name, GLint key, InputType type, void (*callback)(void));
+void AttachInput(InputHandler* handler, char* name, GLint key, InputType type, void (*callback)(void* ), void* params);
 void ProcessInputs(InputHandler* handler);
 
 #endif

@@ -176,3 +176,9 @@ void MatPrint(Mat m)
         printf("\n");
     }
 }
+
+
+void MatFree(Mat m) 
+{
+    free(m.data);
+}

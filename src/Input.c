@@ -20,23 +20,25 @@ InputHandler* InputHandlerInit(Window* target)
     return ih;
 }
 
-void AttachInput(InputHandler* handler, char* name, GLint key, InputType type, void (*callback)(void))
+void AttachInput(InputHandler* handler, char* name, GLint key, InputType type, void (*callback)(void *), void* params)
 {
     if (handler->count >= handler->max) {
         handler->max *= 2;
         handler->callbacks = realloc(handler->callbacks, handler->max * sizeof(InputAction));
     }
 
-    handler->callbacks[handler->count] = (InputAction){name, key, type, callback};
+    handler->callbacks[handler->count] = (InputAction){name, key, type, callback, params};
     handler->count++;
 }
 
 void ProcessInputs(InputHandler* handler)
 {
+    /* TODO: Really should be a map and look up if any is pressed */
     for (size_t i = 0; i < handler->count; i++) {
         InputAction ia = handler->callbacks[i];
 
-        if (glfwGetKey(handler->target->wptr, ia.key) == ia.type) 
-            ia.action();
+        if (glfwGetKey(handler->target->wptr, ia.key) == ia.type) {
+            ia.action(ia.params);
+        }
     }
 }
