@@ -46,6 +46,11 @@ void WindowsTerminate()
     WGLFW_INITIALIZED = false;
 }
 
+void WindowClose(void* param)
+{
+    glfwSetWindowShouldClose((GLFWwindow*)param, true);
+}
+
 void WindowSwap(char* name)
 {
     Window* win = (Window*)MapLook(Windows, name);
@@ -53,6 +58,28 @@ void WindowSwap(char* name)
 
     glfwMakeContextCurrent(win->wptr);
 }
+
+
+
+
+
+void WindowAttachCallback(Window* window, GLFWwindowsizefun glFunc, void (userCallback)(void*), void* userParams)
+{
+    userCallback(userParams); 
+    // TODO: 
+    // 1.) Attach framebuffer_size_callback, and a custom user callback
+      //  framebuffer_size_callback will update glView() with the framebuffer size
+      //  custom user callback will update the persepective matrix (prefarably in the camera)
+   
+    //glfwSetWindowSizeCallback(window->wptr, window_size_callback)
+
+    // Honestly what we could do is pass glfwSetWindowSizeCallback(window->wptr, with the actual callback)
+    //and then pass any custom functions as well as any custom params 
+
+}
+
+
+
 
 
 int LoadGlad() 

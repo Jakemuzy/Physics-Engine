@@ -1,6 +1,6 @@
 ARG=$0
-if (ARG == "--clean") then
-    rm -rf ./builds
+if (ARG == "--clean"); then
+  rm -rf ./builds
 fi
 
 cmake -S . -B ./builds

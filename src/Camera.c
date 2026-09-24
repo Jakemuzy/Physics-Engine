@@ -12,13 +12,23 @@ Camera* InitCamera(Vec3 pos, Vec3 front, Vec3 up) {
     cam->right = Vec3Norm(Vec3Cross(up, cam->dir));
     cam->up = Vec3Cross(cam->dir, cam->right);
 
-    /* View Matrix */
+    /* View Matrix & Projectoin */
     cam->view = MatLookAt(pos, cam->target, up);
 
     /* Other */
     cam->speed = SPEED;
     return cam;
 }
+
+void SetCameraProj(Camera* cam, float width, float height)
+{
+    cam->projection = MatPerspective(45.0f, width / height, 0.1f, 100.0f);
+}
+
+
+
+
+
 
 void CameraLeft(void* camera)
 {

@@ -20,6 +20,7 @@ typedef struct Camera {
     Vec3 front, right, up;
 
     Mat view;
+    Mat projection;
 
     /* Logic */
     float dt, last;
@@ -29,6 +30,8 @@ typedef struct Camera {
 } Camera;
 
 Camera* InitCamera(Vec3 pos, Vec3 front, Vec3 up);
+void SetCameraProj(Camera* cam, float width, float height);
+
 
 /* Void since input callback system is generic */
 void CameraLeft(void* camera);

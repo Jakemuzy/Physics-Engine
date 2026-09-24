@@ -13,16 +13,29 @@
 #include "Camera.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void closeWindow(void* param);
-void processInput(GLFWwindow *window);
 
+static Camera* cam;
 
 int main()
 {
+    // Must be set before window because the framebuffer_size_callback
+    // directly depends on camera, and if it isn't set, program crashes
+    cam = InitCamera(
+        InitVec3(3.0, 0.0, 0.0),
+        InitVec3(-2.0, 0.0, 0.0),
+        InitVec3(0.0, 1.0, 0.0)
+    );
+    SetCameraProj(cam, 800.0f, 600.0f);
+
+
     Window* win = WindowInit("Physics", 800, 600);
     InputHandler* ih = InputHandlerInit(win);
-    
+   
+
+    // Framebuffer size callback should live in the shared space between window and 
+    // camera controller
     glfwSetFramebufferSizeCallback(win->wptr, framebuffer_size_callback);
+
     LoadGlad();
 
     Shader shdr = ShaderProgInit("BasicShader", "shaders/v1.vs", "shaders/f1.fs");
@@ -76,23 +89,16 @@ int main()
         -0.5f, 0.5f,  0.5f,   0.5f,0.9f,0.9f,
         -0.5f, 0.5f, -0.5f,   0.6f,1.0f,1.0f,
     };
-
-    Camera* cam = InitCamera(
-        InitVec3(3.0, 0.0, 0.0),
-        InitVec3(-2.0, 0.0, 0.0),
-        InitVec3(0.0, 1.0, 0.0)
-    );
    
     Mat identity = InitMatIdentity(4,4,1);
-    Mat proj = MatPerspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
     ShaderSetVal("BasicShader", "model", U_MAT4, identity.data);
-    ShaderSetVal("BasicShader", "proj", U_MAT4, proj.data);
+    ShaderSetVal("BasicShader", "proj", U_MAT4, cam->projection.data);
 
     int vertexCount = 36;
     Mesh* mesh = MeshInit("tri", cubeVertices, vertexCount, true, false, false);
 
     /* Input settings */
-    AttachInput(ih, "Escape", GLFW_KEY_ESCAPE, PRESS, (void*)&closeWindow, win->wptr);
+    AttachInput(ih, "Escape", GLFW_KEY_ESCAPE, PRESS, (void*)&WindowClose, win->wptr);
     AttachInput(ih, "Left", GLFW_KEY_A, PRESS, (void*)&CameraLeft, cam);
     AttachInput(ih, "Right", GLFW_KEY_D, PRESS, (void*)&CameraRight, cam);
     AttachInput(ih, "Front", GLFW_KEY_W, PRESS, (void*)&CameraFront, cam);
@@ -115,7 +121,7 @@ int main()
         GLuint sprog = ShaderProgUse("BasicShader"); /* Not required SetVal does this */
         ShaderSetVal("BasicShader", "model", U_MAT4, identity.data);
         ShaderSetVal("BasicShader", "view", U_MAT4, (void*)cam->view.data);
-        ShaderSetVal("BasicShader", "proj", U_MAT4, proj.data);
+        ShaderSetVal("BasicShader", "proj", U_MAT4, cam->projection.data);
         MeshDraw("tri");
 
         glfwSwapBuffers(win->wptr);
@@ -128,12 +134,12 @@ int main()
     return 0;
 }
 
-void closeWindow(void* param) { glfwSetWindowShouldClose((GLFWwindow*)param, true); }
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
+    printf("Framebuffer resize\n");
+    glViewport(0, 0, width, height);
+    SetCameraProj(cam, (float)width, (float)height);
 }
+
 
 

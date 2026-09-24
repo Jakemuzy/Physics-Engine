@@ -37,10 +37,11 @@ extern Map* Windows;
 
 Window* WindowInit(char* name, int width, int height); 
 void    WindowsTerminate();
+void    WindowClose(void* param);
 void    WindowSwap(char* name);
 void    WindowSwapBuff(Window* window);
 
-void WindowAttachCallback(Window* window, void (*glCallback)(void*), void* glParams, void (userCallback)(void*));
+void WindowAttachCallback(Window* window, GLFWwindowsizefun glFunc, void (userCallback)(void*), void* userParams);
 
 int LoadGlad();
 

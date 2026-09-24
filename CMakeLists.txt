@@ -21,8 +21,7 @@ add_executable(Physics-Engine ${ENGINE_SOURCES})
 
 add_library(glad STATIC dependencies/glad/src/glad.c)
 target_include_directories(glad PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/
-    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/KHR
+    ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/include
 )
 
 # Add header files
